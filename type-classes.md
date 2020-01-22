@@ -21,18 +21,19 @@
 
 ## Overview
 
-A big part of the confusion regarding implicit stems from the attempt to bend their mechanic in order to introduce type classes into the language. This proposal views type classes as "first class citizens" that deserve their own set of constructs and rules that are focused solely on the use-case of type classes.
+A big part of the confusion regarding implicit stems from the attempt to bend their mechanic in order to introduce type classes into the language. This proposal views type classes as "first class citizens" that deserve their own set of constructs and rules that are focused solely on them.
 
-It is not so simple to determine what are the common use-cases for type classes in general, and in Scala in particular. This is even more difficult for me as I did not experience their usage first-hand. I am not part of the functional-programming community; even though type classes are not inherently related to FP, they were introduced by those languages and are widely used in that community.
+It is not so simple to determine what are the common use-cases for type classes in general, and in Scala in particular. This is even more difficult for me as I did not experience their usage first-hand. I am not part of the functional-programming community; and even though type classes are not inherently related to FP, they were introduced by those languages and are widely used in that community.
 
 ### Goals
 
-Despite my lack of experience with type classes, I did gather the following requirements for type classes in Scala from previous discussions and proposals:
+Despite my lack of experience with type classes, I did gather the following requirements from previous discussions and proposals:
 
 - Multi parameter type classes.
-- Orphan instances and easy resolution of coherence.
+- Orphan instances.
 - Infix / unary operations.
-- Branching type class "inheritance" -- aka "the diamond problem".
+- Branching type class inheritance -- aka "the diamond problem".
+- Easy resolution of coherence (covered by [lenses](lenses.md##resolving-conflicts)).
 
 This proposal sets itself these requirements as goals that must be achieved.
 
@@ -42,7 +43,7 @@ This proposal sets itself these requirements as goals that must be achieved.
 
 A type class is composed of two parts; interface and implementation. An interface declares abstract functions -- mostly on the enclosed generic type(s) -- while the implementation defines concrete instructions for these functions.
 
-Despite this concept being shared with inheritance and subtyping, type classes are a different concept. A type class interface should not be thought of as a `trait` or an `abstract class`, and its implementation should not be thought of as an `object` or an "instance" in the OOP view of things.
+Despite this concept being shared with inheritance and subtyping, type classes are a different concept. A type class interface should not be thought of as a `trait` nor an `abstract class`, and its implementation should not be thought of as an `object` nor an "instance" in the OOP perspective.
 
 For the purpose of familiarity, this proposal will use the term `typeclass` for the interface of a type class and `typeinstance` for the implementation. I'll leave the discussion regarding the specific wording outside the scope of this proposal.
 
@@ -67,7 +68,7 @@ The structure is quite similar to that of regular classes, however there are a f
 - A `typeclass` must have at least one type-parameter.
 - A `typeclass` cannot "extend" other `typeclass`es.
 - Both `typeclass` and `typeinstance` have no constructor and cannot be instantiated.
-- A `typeinstance` must be declared inside a `lens` (see [lenses](lens.md)).
+- A `typeinstance`, being an "implicit interpretation", must be declared inside a `lens` (see [lenses](lens.md#restrictions)).
 - A `typeinstance` is never anonymous.
 
 ### Bounds
@@ -83,6 +84,8 @@ trait Set[A]<Eql[A, A]> {
 ```
 
 Unlike the old context bounds, this new form of "type class bounds" is not mapped to a parameter, and therefore can be defined anywhere a type-parameter is defined, no matter if that definition accepts parameters or not (`trait`s do not accept parameters). This makes it much more closely related to (upper / lower) type bounds than the old context bounds.
+
+Note that the specific `<>` syntax used in this proposal is not the important part -- [as mentioned earlier](README.md#a-word-about-syntax) -- and was chosen because it is quite distinguishable from the old syntax, which makes it clearer to see the changes introduced in this proposal.
 
 ### Usage
 
@@ -104,9 +107,9 @@ Since type classes and instances are not data types, they need not to consider v
 typeclass Ordering[+A] { ... }
 ```
 
-## Advanced features
-
 They are never placed in any location that requires variance considerations -- e.g., variable, parameter, return type.
+
+## Advanced features
 
 ### Infix notation
 
@@ -114,16 +117,16 @@ Type classes have the unique ability to define infix operations on their enclose
 
 ```scala
 typeclass Eql[A, B] {
-    def areEqual(a: A, b: B): Boolean
+  def areEqual(a: A, b: B): Boolean
 
-    def infix(a: A) {
-        def ==(b: B) = areEqual(a, b)
-    }
-  
-    // alternative syntax
-    def infix[B] { b =>
-        def ==(a: A) = areEqual(a, b)
-    }
+  def infix(a: A) {
+      def ==(b: B) = areEqual(a, b)
+  }
+
+  // alternative syntax
+  def infix[B] { b =>
+      def ==(a: A) = areEqual(a, b)
+  }
 }
 ```
 
@@ -281,7 +284,7 @@ This "lens lookup" feature -- aka `summon` -- should not be allowed in runtime. 
 
 Another topic covered in the "contextual abstractions" proposal is [multiversal type-safe equality](https://dotty.epfl.ch/docs/reference/contextual/multiversal-equality.html), which is also not clearly supported in this proposal.
 
-Not to be mistaken, an equality type class -- aka `Eql` -- is a completely valid and use-case, which helps signifying that a certain unit requires a special and dedicated care for the equality of its types. Collections are a good example of this:
+Not to be mistaken, an equality type class -- aka `Eql` -- is a completely valid use-case, which helps signify that a certain unit requires a special and dedicated care for the equality of its types. Collections are a good example of this:
 
 ```scala
 trait Set[A]<Eql[A, A]>
@@ -294,7 +297,7 @@ object equality {
   val a: String = "a"
   val b: Int = 2
 
-  // doesn't resolve to Eql.== infix method
+  // doesn't resolve to `Eql.==` infix method
   a == b
 
   // resolves correctly

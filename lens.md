@@ -1,7 +1,6 @@
 # Lenses
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=6 orderedList=false} -->
-
 <!-- code_chunk_output -->
 
 - [Rationale](#rationale)
@@ -10,11 +9,14 @@
     - [Conflict resolution](#conflict-resolution)
     - [Global coherence](#global-coherence)
 - [Syntax and semantics](#syntax-and-semantics)
+  - [Restrictions](#restrictions)
   - [Companion lens](#companion-lens)
   - [Package lens](#package-lens)
   - [Including lens](#including-lens)
     - [Encapsulation](#encapsulation)
   - [Resolving conflicts](#resolving-conflicts)
+    - [Shadowing](#shadowing)
+    - [Including resolutions](#including-resolutions)
 
 <!-- /code_chunk_output -->
 
@@ -24,13 +26,13 @@
 
 One complaint about implicits that might play a large role in the confusion surrounding them is the lack of visibility regarding the origin of an implicit in a given scope.
 
-Implicits are automatically applied whenever they are `import`ed into a scope. This "effect" may be regarded as a side-effect, as it is both unseen and doesn't exist for any other construct. It may be confusing for newcomers who expect `import` to act as a name-resolution mechanic and nothing more.
+Implicits are automatically applied whenever they are `import`ed into a scope. This may be regarded as a side-effect, as it is both unseen and doesn't exist for any other construct. It may be confusing for newcomers who expect `import` to act as a name-resolution mechanic and nothing more.
 
-The aim of this part of the proposal is to better help developers identify the origins of implicits in their scope -- preferably by mere static analysis of the source code -- and to distinguish between name resolution and the appliance of implicit definitions.
+One of the aims of this part of the proposal is to better help developers identify the origins of implicits in their scope -- preferably by mere static analysis of the source code -- and to distinguish between name resolution and the appliance of implicit interpretations.
 
 ### The problem of ambiguity
 
-In programming, ambiguity arises whenever a compiler (or interpreter) cannot infer the meaning of a piece of code, because it has more than one valid interpretation.
+In programming, ambiguity arises whenever a compiler (or interpreter) cannot infer the meaning of a piece of code because it has more than one valid interpretation.
 
 Name collisions are one example of an ambiguity, and in Scala there are a few yet sufficient ways for dealing with them. Function overloading is another area where ambiguity might creep in, but it's usually easy to detect and resolve.
 
@@ -67,18 +69,18 @@ object local {
 }
 ```
 
-Despite this proposal's approach on splitting the abstraction connecting the various implicit use cases, it does acknowledge this as a shared problem between them; that is, except for dependency injection, where everything is defined locally.
+Despite this proposal's approach on splitting the abstraction connecting the various implicit techniques, it does acknowledge this as a shared problem between them; that is, except for dependency injection, where everything is defined locally.
 
 #### Conflict resolution
 
 If we look at name conflicts, there are two ways to resolve them. The first is renaming the symbol on `import`, which resolves the conflicts for the entire scope. The second is to specify the fully qualified name of the symbol, which resolves it for that location and that location only.
 
-This proposal wishes to enable conflict resolution for implicits via the "scope resolution" rather than "call-site resolution". There are two reasons for this approach:
+This proposal wishes to enable conflict resolution for implicits via the "scope resolution" rather than "call-site resolution", and for two reasons:
 
 1. Implicits are all about less verbose code, and call-site resolution is by far a more verbose option.
 2. Call-site resolution requires invention of new syntax that needs to integrate with already existing language construct, making it a hefty task to say the least.
 
-Additionally, unlike name resolution, implicit resolution could be extended to support larger scopes than a just single source-code file, by allowing to specify resolutions inside a package object and thus applying these resolutions to the entire package.
+Additionally, unlike name resolution, implicit resolution could be extended to support larger scopes than just a single source-code file, by specifying resolutions inside a package object and thus applying these resolutions to the entire package.
 
 #### Global coherence
 
@@ -86,7 +88,7 @@ Coherence is the property of a program which determines whether its meaning can 
 
 Coherence can be attempted via global coherence or "global uniqueness", which states that no ambiguous interpretations should be allowed to co-exist across the entire program -- including third party dependencies -- no matter if they are being used or not.
 
-For instance, in the case of type classes, global coherence means that no two type-instance definitions for the same type class and type may exist in the entire program.
+For instance, in the case of type classes, global coherence means that no two type instance definitions for the same type class and type may exist in the entire program.
 
 Global coherence is extremely problematic, and for two reasons:
 
@@ -124,7 +126,7 @@ There are two restrictions regarding lenses and implicit interpretations:
 
 ### Companion lens
 
-Companion lens are similar to companion objects in the sense that they accompany another class, but their purpose is different. They are the most basic form of introducing implicit interpretation into a scope -- that of their companion class and / or object:
+Companion lens are similar to companion objects in the sense that they accompany another class, but their purpose is different. They are the most basic form of introducing implicit interpretation into a scope -- that of their companion class or object:
 
 ```scala
 case class Foo(bar: Int)
@@ -144,7 +146,7 @@ lens FooSorter {
 }
 ```
 
-Note that there is no need to `import` any of the interpretations; they are automatically applied in the companion class / object.
+Note that there is no need to `import` any of the interpretations; they are automatically applied in the companion class and object.
 
 ### Package lens
 
@@ -240,7 +242,7 @@ lens b includes a
 
 Whenever conflicting interpretations are included in the same lens, the will need to be resolved, otherwise the compiler will emit an error.
 
-There are plenty of syntaxes that may work for conflict resolution; [as mentioned earlier](README.md#details), this proposal does not concern itself too heavily with the exact syntax that will be chosen. The only concern is that conflict resolution will be declared inside the `lens`:
+There are plenty of syntaxes that may work for conflict resolution; [as mentioned earlier](README.md#a-word-about-syntax), this proposal does not concern itself too heavily with the exact syntax that will be chosen. The only concern is that conflict resolution will be declared inside the `lens`:
 
 ```scala
 lens a {
