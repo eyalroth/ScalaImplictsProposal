@@ -21,6 +21,7 @@ lens MyApp {
 
 This proposal is undecided whether chaining conversions should be allowed and leaves this open to discussion:
 
+```scala
 object MyApp {
   val s: String = 1.5
 }
@@ -29,6 +30,7 @@ lens MyApp {
   conversion doubleToInt(d: Double): Int = d.toInt()
   conversion intToString(i: Int): String = i.toString()
 }
+```
 
 ## Type classes
 
