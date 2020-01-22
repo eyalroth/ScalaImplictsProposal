@@ -72,7 +72,7 @@ The structure is quite similar to that of regular classes, however there are a f
 
 ### Bounds
 
-Type classes are used only in conjunction with other type-parameterized (generic) constructs; functions, classes (constructors) or other type-classes. In order to use a type class, one must first require that it will be available for the parameterized type(s):
+Type classes are used only in conjunction with other type-parameterized (generic) constructs; functions, classes (constructors) or other type classes. In order to use a type class, one must first require that it will be available for the parameterized type(s):
 
 ```scala
 def sort[A]<Ordering[A]>(xs: Seq[A]): Seq[A] = ???

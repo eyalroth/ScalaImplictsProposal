@@ -1,4 +1,4 @@
-# Lens
+# Lenses
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=6 orderedList=false} -->
 
@@ -240,7 +240,7 @@ lens b includes a
 
 Whenever conflicting interpretations are included in the same lens, the will need to be resolved, otherwise the compiler will emit an error.
 
-There are plenty of syntaxes that may work for conflict resolution; as mentioned earlier, this proposal does not concern itself too heavily with the exact syntax that will be chosen. The only concern is that conflict resolution will be declared inside the `lens`:
+There are plenty of syntaxes that may work for conflict resolution; [as mentioned earlier](README.md#details), this proposal does not concern itself too heavily with the exact syntax that will be chosen. The only concern is that conflict resolution will be declared inside the `lens`:
 
 ```scala
 lens a {
