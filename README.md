@@ -39,8 +39,4 @@ The details of the proposal are described in the following documents:
 
 ### A word about syntax
 
-Please **note** that this proposal does not concern itself too heavily with the exact syntax that will eventually express the concepts it introduces. There are many small syntactic details and variations that change very little the general notions and ideas of the proposal, and therefore they will not be discussed in depth.
-
-## Comparison with contextual abstractions
-
-TODO complete
+Please note that this proposal does not concern itself too heavily with the exact syntax that will eventually express the concepts it introduces. There are many small syntactic details and variations that change very little the general notions and ideas of the proposal, and therefore they will not be discussed in depth.
