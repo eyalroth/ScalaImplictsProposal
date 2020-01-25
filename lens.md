@@ -39,7 +39,7 @@ Name collisions are one example of an ambiguity, and in Scala there are a few ye
 On the other hand, deduction of implicits is an area where ambiguity is often impossible to resolve, because the conflicting interpretations are defined externally and because there are no means provided to resolve these conflicts locally:
 
 ```scala
-package a {
+object a {
   implicit object IntOrderingA extends Ordering[Int] {
     override def compare(x: Int, y: Int): Int = 1
   }
@@ -49,7 +49,7 @@ package a {
   implicit def intToStringA(i: Int): String = i.toString() + "a"
 }
 
-package b {
+object b {
   implicit object IntOrderingB extends Ordering[Int] {
     override def compare(x: Int, y: Int): Int = -1
   }
@@ -78,7 +78,7 @@ If we look at name conflicts, there are two ways to resolve them. The first is r
 This proposal wishes to enable conflict resolution for implicits via the "scope resolution" rather than "call-site resolution", and for two reasons:
 
 1. Implicits are all about less verbose code, and call-site resolution is by far a more verbose option.
-2. Call-site resolution requires invention of new syntax that needs to integrate with already existing language construct, making it a hefty task to say the least.
+2. Call-site resolution requires new syntax that needs to integrate with existing language constructs, making it a hefty task to say the least.
 
 Additionally, unlike name resolution, implicit resolution could be extended to support larger scopes than just a single source-code file, by specifying resolutions inside a package object and thus applying these resolutions to the entire package.
 

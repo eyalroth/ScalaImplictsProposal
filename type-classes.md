@@ -33,7 +33,7 @@ Despite my lack of experience with type classes, I did gather the following requ
 - Orphan instances.
 - Infix / unary operations.
 - Branching type class inheritance -- aka "the diamond problem".
-- Easy resolution of coherence (covered by [lenses](lenses.md##resolving-conflicts)).
+- Easy resolution of coherence (covered by [lenses](lenses.md#resolving-conflicts)).
 
 This proposal sets itself these requirements as goals that must be achieved.
 
@@ -43,7 +43,7 @@ This proposal sets itself these requirements as goals that must be achieved.
 
 A type class is composed of two parts; interface and implementation. An interface declares abstract functions -- mostly on the enclosed generic type(s) -- while the implementation defines concrete instructions for these functions.
 
-Despite this concept being shared with inheritance and subtyping, type classes are a different concept. A type class interface should not be thought of as a `trait` nor an `abstract class`, and its implementation should not be thought of as an `object` nor an "instance" in the OOP perspective.
+Despite this concept being shared with inheritance and subtyping, type classes are a different concept. A type class interface should not be thought of as a `trait` nor an `abstract class`, and its implementation should not be thought of as an `object` nor an "instance" in the OOP notion.
 
 For the purpose of familiarity, this proposal will use the term `typeclass` for the interface of a type class and `typeinstance` for the implementation. I'll leave the discussion regarding the specific wording outside the scope of this proposal.
 
@@ -55,11 +55,11 @@ typeclass Ordering[A] {
 }
 
 lens Ordering {
-    typeinstance IntOrdering implements Ordering[Int] {
-        override def compare(x: Int, y: Int): Int = {
-          java.lang.Integer.compare(x, y)
-        }
+  typeinstance IntOrdering implements Ordering[Int] {
+    override def compare(x: Int, y: Int): Int = {
+      java.lang.Integer.compare(x, y)
     }
+  }
 }
 ```
 
@@ -120,12 +120,12 @@ typeclass Eql[A, B] {
   def areEqual(a: A, b: B): Boolean
 
   def infix(a: A) {
-      def ==(b: B) = areEqual(a, b)
+    def ==(b: B) = areEqual(a, b)
   }
 
   // alternative syntax
   def infix[B] { b =>
-      def ==(a: A) = areEqual(a, b)
+    def ==(a: A) = areEqual(a, b)
   }
 }
 ```

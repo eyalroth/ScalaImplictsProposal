@@ -34,7 +34,7 @@ lens MyApp {
 
 ## Type classes
 
-Conversions _cannot_ be encoded using [type classes](type-classes.md):
+Conversions **cannot** be encoded using [type classes](type-classes.md):
 
 ```scala
 typeclass Conversion[A, B] {

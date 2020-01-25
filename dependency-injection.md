@@ -45,7 +45,7 @@ The proposal will use the pair of `implied` and `imply`, but they could be easil
 
 `implied` parameters behave similarly to how `implicit` parameters behave nowadays - values are passed to them indirectly, and in-turn they pass themselves indirectly to `implied` parameters of nested functions (propagation).
 
-Any expression can become implied in a certain context by `imply`-ing it:
+Any expression can become implied in a certain scope by `imply`-ing it:
 
 ```scala
 imply 2

@@ -14,7 +14,7 @@ It's not only that all of these use te same [polysemic](https://en.wikipedia.org
 
 This abstraction is the major cause of confusion with implicits, as it is not always easy to grasp and is often not necessary for the everyday developer.
 
-At its core, this proposal wishes to to break this abstraction and grant each feature its own unique set of constructs, completely separated / orthogonal to the others. Call a spade a spade; or as we say in Hebrew, call a child by his name.
+At its core, this proposal wishes to break this abstraction and grant each feature its own unique set of constructs, completely separated / orthogonal to the others. Call a spade a spade; or as we say in Hebrew, call a child by his name.
 
 ### Context
 
