@@ -36,6 +36,7 @@ The details of the proposal are described in the following documents:
 3. [Type classes](type-classes.md).
 4. [Extensions (extension methods)](extensions.md).
 5. [Type conversions](type-conversions.md).
+6. [Comparison with Scala 2 implicits](vs-scala2.md).
 
 ### A word about syntax
 
