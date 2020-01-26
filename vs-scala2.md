@@ -14,6 +14,7 @@
   - [Named implicit values](#named-implicit-values)
   - [Importing implicit values](#importing-implicit-values)
   - [Context bounds](#context-bounds)
+  - [Extensions of generic types](#extensions-of-generic-types)
 
 <!-- /code_chunk_output -->
 
@@ -180,4 +181,52 @@ Instead, this proposal introduces [bounds for type classes](type-classes.md#boun
 ```scala
 def sort[A]<Ordering[A]>(xs: Seq[A]): Seq[A] = ???
 def contains[A]<Eql[A, A]>(set: Set[A], elem: A): Boolean = ???
+```
+
+### Extensions of generic types
+
+In Scala 2, it is possible to define extension methods on generic types:
+
+```scala
+implicit class MyExtensions[A](any: A) { ... }
+```
+
+It is impossible in this proposal to extend generic types via extensions (much like it's impossible to do with regular classes):
+
+```scala
+// impossible to directly extend the type-parameter `A`
+extension MyExtensions[A] extends A { ... }
+```
+
+The major application for this capability in Scala 2 is to add infix operations for type classes:
+
+```scala
+implicit class InfixOrdered[A](any: A)(implicit ord: Ordered[A]) {
+  def compareTo(other: A): Int = ord.compare(any, other)
+}
+```
+
+However, in this proposal it is possible to directly [define infix methods on type classes](type-classes.md#infix-notation).
+
+In the case of third-party type classes -- where one cannot edit the type class -- there is the option of "extending" the type class:
+
+```scala
+typeclass InfixOrdered[A]<Ordered[A]> {
+  def infix(a: A) {
+    def compareTo(b: A): Int = Ordered.compare(a, b)
+  }
+}
+
+lens InfixOrdered {
+  typeinstance GenericInfixOrdered[A]<Ordered[A]> implements InfixOrdered[A]
+}
+```
+
+That will require to bound any type to the new custom type class instead of the original one:
+
+```scala
+def sort[A]<InfixOrdered[A]>(xs: Seq[A]): Seq[A] = {
+  xs.head.compareTo(xs.tail.head)
+  ...
+}
 ```
