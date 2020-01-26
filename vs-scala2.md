@@ -58,7 +58,7 @@ typeinstance IntOrdering implements Ordering[Int] {
 }
 ```
 
-Additionally, the interpretations are declared inside the `lens` component only.
+Note that this not a mere change of syntax. Implicit interpretations are no longer viewed as objects or instances in the OOP sense and cannot be instantiated or invoked in the way other objects do; instead, they are declared inside `lens` components (and there only) and so they become "implicitly" available in a scope.
 
 ### Importing implicit interpretations
 
