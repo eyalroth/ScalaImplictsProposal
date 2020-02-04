@@ -38,6 +38,9 @@ trait Ordering[A] {
 implicit object IntOrdering extends Ordering[A] {
   def compare(x: Int, y: Int): Int = ???
 }
+implicit def optionOrdering[A: Ordering] = new Ordering[Option[A]] {
+  def compare(x: Option[A], y: Option[A]): Int = ???
+}
 ```
 
 In this proposal, instead of using the same prefix construct with other existing definition constructs, each form of implicit interpretation is given unique definition constructs:
@@ -55,6 +58,9 @@ typeclass Ordering[A] {
 }
 typeinstance IntOrdering implements Ordering[Int] {
   def compare(x: Int, y: Int): Int = ???
+}
+typeinstance OptionOrdering[A]<Ordering[A]> implements Ordering[Option[A]] {
+  def compare(x: Option[A], y: Option[A]): Int = ???
 }
 ```
 
@@ -97,18 +103,6 @@ lens local includes external
 ### Local resolutions
 
 Resolution of conflicting implicit interpretations is possible via [lenses](lens.md#resolving-conflicts), while in Scala 2 it is not possible at all.
-
-### Generic type instances
-
-Generic implementations of type classes ("type instances") are possible in this proposal, while they are not possible in Scala 2.
-
-In Scala 2, type classes are modeled via `trait`s and `implicit object`s, and since `object`s cannot be generic (cannot have a type parameter), this capability is not possible.
-
-This capability bring new possible designs:
-
-- Induction of type class implementations based on implementations of nested types (see [induction](type-classes.md#induction-generic-type-instances)).
-- Modeling a branching hierarchy of type classes (see [the diamond problem](type-classes.md#the-diamond-problem)).
-- Auto generation of "reflective" type class implementations (see [derivation](type-classes.md#derivation)).
 
 ### Anonymous implicit parameters
 

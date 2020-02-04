@@ -12,9 +12,10 @@
   - [Variance](#variance)
 - [Advanced features](#advanced-features)
   - [Infix notation](#infix-notation)
-  - [Induction (generic type instances)](#induction-generic-type-instances)
-  - [The diamond problem](#the-diamond-problem)
-  - [Derivation](#derivation)
+  - [Generic type instances](#generic-type-instances)
+    - [Induction](#induction)
+    - [The diamond problem](#the-diamond-problem)
+    - [Derivation](#derivation)
   - [Multiversal equality](#multiversal-equality)
 
 <!-- /code_chunk_output -->
@@ -140,9 +141,23 @@ class Set[A]<Eql[A, A]> {
 }
 ```
 
-### Induction (generic type instances)
+### Generic type instances
 
-Similarly to [LukaJCB's proposal](https://github.com/LukaJCB/typeclass-proposal/blob/master/docs/instances.md#multiple-inductive-instances), we can define "inductive" type instances by declaring them with a type parameter and binding it to a type class:
+Type instances may be generic (have type parameters):
+
+```scala
+lens Eql {
+  typeinstance GenericEql[A, B] implements Eql[A, B] {
+    override def areEqual(a: A, b: B): Boolean = a eq b
+  }
+}
+```
+
+This capability is especially useful when the type parameters are bound to a type class, as shown in the following use cases:
+
+#### Induction
+
+Similarly to [LukaJCB's proposal](https://github.com/LukaJCB/typeclass-proposal/blob/master/docs/instances.md#multiple-inductive-instances), we can define type instances that are "deduced" from nested type instances:
 
 ```scala
 case class Foo[A](value: A)
@@ -160,7 +175,7 @@ lens Foo {
 }
 ```
 
-### The diamond problem
+#### The diamond problem
 
 One of the problems with encoding type classes via subtyping is that it doesn't easily support branching hierarchies -- aka "the diamond problem" -- which is described [in this article](https://typelevel.org/blog/2016/09/30/subtype-typeclasses.html). The problem can be largely mitigated under the current proposal.
 
@@ -183,7 +198,7 @@ object fanctors {
 }
 ```
 
-We can use "inductive" type instances to implement the "root" type class `Functor` with either of the branching type classes:
+We can use genreic type instances to implement the "root" type class `Functor` with either of the branching type classes:
 
 ```scala
 lens functors {
@@ -214,7 +229,7 @@ However, since both `typeinstance`s were declared in the same `lens`, there is n
 
 In cases where there is an ambiguity, the conflicts can be resolved [via lenses](lens.md#resolving-conflicts).
 
-### Derivation
+#### Derivation
 
 The type class derivation mechanism [described in the "contextual abstractions" proposal](https://dotty.epfl.ch/docs/reference/contextual/derivation.html) and [inspired by Haskell](https://www.haskell.org/onlinereport/haskell2010/haskellch11.html) is not inherently supported by this proposal.
 
