@@ -114,24 +114,25 @@ They are never placed in any location that requires variance considerations -- e
 
 ### Infix notation
 
-Type classes have the unique ability to define infix operations on their enclosed types:
+It is possible to introduce infix operations with type classes via (generic) extensions:
 
 ```scala
 typeclass Eql[A, B] {
   def areEqual(a: A, b: B): Boolean
+}
 
-  def infix(a: A) {
-    def ==(b: B) = areEqual(a, b)
+lens Eql {
+  extension InfixEql[L] extends L {
+    def ==[R]<Eql[L, R]>(right: R): Boolean = Eql.areEqual(this, right)
   }
 
-  // alternative syntax
-  def infix[B] { b =>
-    def ==(a: A) = areEqual(a, b)
+  extension ReverseInfixEql[L] extends L {
+    def ==[R]<Eql[R, L]>(right: R): Boolean = Eql.areEqual(this, right)
   }
 }
 ```
 
-The infix operations will be available on instances of types that were bound to the type class:
+The infix operations will be available on instances of types that were bound to the type class, assuming that the extensions are included in the lens as well:
 
 ```scala
 class Set[A]<Eql[A, A]> {
@@ -139,6 +140,8 @@ class Set[A]<Eql[A, A]> {
     internal.exists(_ == elem)
   }
 }
+
+lens Set includes Eql
 ```
 
 ### Generic type instances
@@ -297,30 +300,4 @@ This "lens lookup" feature -- aka `summon` -- should not be allowed in runtime. 
 
 ### Multiversal equality
 
-Another topic covered in the "contextual abstractions" proposal is [multiversal type-safe equality](https://dotty.epfl.ch/docs/reference/contextual/multiversal-equality.html), which is also not clearly supported in this proposal.
-
-Not to be mistaken, an equality type class -- aka `Eql` -- is a completely valid use-case, which helps signify that a certain unit requires a special and dedicated care for the equality of its types. Collections are a good example of this:
-
-```scala
-trait Set[A]<Eql[A, A]>
-```
-
-However, enabling the globally available equality operator `==` is impossible to do with type classes, as they do not work with concrete types, but only with parameterized types that are also bound to them:
-
-```scala
-object equality {
-  val a: String = "a"
-  val b: Int = 2
-
-  // doesn't resolve to `Eql.==` infix method
-  a == b
-
-  // resolves correctly
-  def eql[A, B]<Eql[A, B]>(a: A, b: B): Boolean = a == b
-  eql(a, b)
-}
-
-lens equality {
-  typeinstance StringIntEql implements Eql[String, Int] { ... }
-}
-```
+Another topic covered in the "contextual abstractions" proposal is [multiversal type-safe equality](https://dotty.epfl.ch/docs/reference/contextual/multiversal-equality.html), which can be achieved in this proposal via a combination of type classes and generic extension methods; that is, assuming that the extensions shown in the [infix notation section](#infix-notation) will be automatically included in every lens.
